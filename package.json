@@ -1,0 +1,14 @@
+{
+  "name": "text-editor",
+  "version": "1.0.0",
+  "description": "open source alternative for scribner",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "fifteenmania",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^15.3.0"
+  }
+}
