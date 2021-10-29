@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeTheme, Menu, MenuItem, globalShortcut} = require('electron');
 const path = require('path');
 
 
@@ -10,8 +10,10 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js')
         }
     });
-    win.loadFile('static/index.html');
+    win.loadFile('src/index.html');
+}
 
+function registerIpcApi() {
     ipcMain.handle('dark-mode:toggle', () => {
         if (nativeTheme.shouldUseDarkColors) {
             nativeTheme.themeSource = 'light';
@@ -20,15 +22,34 @@ function createWindow() {
         }
         return nativeTheme.shouldUseDarkColors;
     })
-    
     ipcMain.handle('dark-mode:system', () => {
         nativeTheme.themeSource = 'system';
     })
 }
 
+function createMenu() {
+    const menu = new Menu()
+    menu.append(new MenuItem({
+        label: 'Electron',
+        submenu: [{
+            role: 'help',
+            accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Alt+Shift+I',
+            click: () => {console.log('Electron rocks!')}
+        }]
+    }))
+    return menu;
+}
+
+Menu.setApplicationMenu(createMenu())
+
 // app on ready
-app.whenReady().then(() => {
+app.whenReady().then(()=>{
+    globalShortcut.register('Alt+CommandOrControl+I', () => {
+        console.log('Electron loves global shortcuts!');
+    })
+}).then(() => {
     createWindow();
+    registerIpcApi();
     app.on('activate', function() {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
