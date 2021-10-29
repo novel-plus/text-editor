@@ -1,38 +1,34 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
 const path = require('path');
-const { dialog, remote } = require('electron');
-const fs = require('fs');
 
-function openFile() {
-    dialog.showOpenDialog((fileNames) => {
-        if (fileNames === undefined) {
-            console.log("No file selected");
-            return;
-        }
-    
-        fs.readFile(filePath, 'utf-8', (err, data) => {
-            if (err) {
-                alert("An error occured reading the file: " + err.message);
-                return;
-            }
-            
-            console.log("the file content is : " + data);
-        });
-    })
-}
 
 function createWindow() {
     const win = new BrowserWindow({
         width: 800,
-        height: 600
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+        }
     });
     win.loadFile('static/index.html');
+
+    ipcMain.handle('dark-mode:toggle', () => {
+        if (nativeTheme.shouldUseDarkColors) {
+            nativeTheme.themeSource = 'light';
+        } else {
+            nativeTheme.themeSource = 'dark';
+        }
+        return nativeTheme.shouldUseDarkColors;
+    })
+    
+    ipcMain.handle('dark-mode:system', () => {
+        nativeTheme.themeSource = 'system';
+    })
 }
 
 // app on ready
 app.whenReady().then(() => {
     createWindow();
-    openFile();
     app.on('activate', function() {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
