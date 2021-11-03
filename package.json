@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "make-windows": "electron-forge make --platform win32 --targets @electron-forge/maker-squirrel"
   },
   "author": "fifteenmania",
   "license": "MIT",
