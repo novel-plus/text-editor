@@ -18,6 +18,10 @@ function handleFileLoad({canceled, path, content}) {
     renderedHtmlContainer.innerHTML = renderMarkDownToHtml(content);
 }
 
+newFileButton.addEventListener('click', () => {
+    window.fileControl.new();
+})
+
 loadFileButton.addEventListener('click', () => {
     window.fileControl.open().then(handleFileLoad);
 })
