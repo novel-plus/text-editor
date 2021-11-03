@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>예제 마크다운 텍스트 편집기</title>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <div class="root">
+            <div class="controls">
+                <button class="control-button" id="new-file-button">새 창</button>
+                <button class="control-button" id="load-file-button">파일 불러오기</button>
+                <button class="control-button" id="save-file-button">파일 저장</button>
+            </div>
+            <div class="contents">
+                <div class="raw-markdown-wrapper">
+                    <textarea id="raw-markdown"></textarea>
+                </div>
+                <div id="rendered-html"></div>
+            </div>
+        </div>
+    </body>
+    <script src="renderer.js"></script>
+</html>

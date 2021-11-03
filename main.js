@@ -1,65 +1,71 @@
-const { app, BrowserWindow, ipcMain, nativeTheme, Menu, MenuItem, globalShortcut} = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
-
-function createWindow() {
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+function createMainWindow() {
+    const mainWindow = new BrowserWindow({
+        width: 600,
+        height: 800,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
-        }
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: true
+        },
+        show: false
+    })
+    mainWindow.loadFile('editor/index.html');
+    return mainWindow;
+}
+
+async function loadTextFile(targetWindow) {
+    const file = await dialog.showOpenDialog(targetWindow, {
+        properties: ['openFile'],
+        filters: [
+            { name: '마크다운 파일', extensions: ['md', 'markdown'] },
+            { name: '텍스트 파일', extensions: ['txt'] },
+            { name: '모든 파일', extensions: ['*'] }
+        ]
     });
-    win.loadFile('src/index.html');
+    const result = {
+        canceled: true,
+        path: '',
+        content: ''
+    }
+    const canceled = file.canceled;
+    const path = file.filePaths[0];
+    if (canceled || !path)
+        return result;
+    const content = fs.readFileSync(path).toString();
+
+    result.canceled = canceled;
+    result.path = path;
+    result.content = content;
+    return result;
 }
 
-function registerIpcApi() {
-    ipcMain.handle('dark-mode:toggle', () => {
-        if (nativeTheme.shouldUseDarkColors) {
-            nativeTheme.themeSource = 'light';
-        } else {
-            nativeTheme.themeSource = 'dark';
-        }
-        return nativeTheme.shouldUseDarkColors;
+function initializeWindows() {
+    const mainWindow = createMainWindow();
+    
+    ipcMain.handle('fileControl:open', (event) => {
+        return loadTextFile(mainWindow);
     })
-    ipcMain.handle('dark-mode:system', () => {
-        nativeTheme.themeSource = 'system';
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
     })
 }
 
-function createMenu() {
-    const menu = new Menu()
-    menu.append(new MenuItem({
-        label: 'Electron',
-        submenu: [{
-            role: 'help',
-            accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Alt+Shift+I',
-            click: () => {console.log('Electron rocks!')}
-        }]
-    }))
-    return menu;
-}
 
-Menu.setApplicationMenu(createMenu())
-
-// app on ready
-app.whenReady().then(()=>{
-    globalShortcut.register('Alt+CommandOrControl+I', () => {
-        console.log('Electron loves global shortcuts!');
-    })
-}).then(() => {
-    createWindow();
-    registerIpcApi();
-    app.on('activate', function() {
+// main loop
+app.whenReady().then(() => {
+    initializeWindows();
+    app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
+            initializeWindows();
         }
-    });
-});
+    })
+})
 
-// app on close
-app.on('window-all-closed', function() {
+app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
-});
+})

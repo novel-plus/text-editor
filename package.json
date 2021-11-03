@@ -9,6 +9,7 @@
   "author": "fifteenmania",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^15.3.0"
+    "electron": "^15.3.0",
+    "marked": "^4.0.0"
   }
 }
