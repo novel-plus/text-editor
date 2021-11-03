@@ -11,7 +11,7 @@ function renderMarkDownToHtml(markdown) {
 }
 
 function handleFileLoad({canceled, path, content}) {
-    if (canceled) {
+    if (!!canceled) {
         return;
     }
     rawMarkdownContainer.value = content;

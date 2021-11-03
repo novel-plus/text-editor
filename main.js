@@ -4,14 +4,13 @@ const fs = require('fs');
 
 function createMainWindow() {
     const mainWindow = new BrowserWindow({
-        width: 600,
-        height: 800,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true
         },
         show: false
     })
+    mainWindow.maximize();
     mainWindow.loadFile('editor/index.html');
     return mainWindow;
 }
