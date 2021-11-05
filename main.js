@@ -18,7 +18,7 @@ function createMainWindow() {
     Menu.setApplicationMenu(menu);
     mainWindow.loadFile(indexHtmlPath);
 
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
     return mainWindow;
 }
 
@@ -45,12 +45,12 @@ function createMenu() {
     menu.append(new MenuItem({
         label: '파일',
         submenu: [{
-            role: 'new file',
+            role: 'newFile',
             label: '새 파일',
             accelerator: isMac ? 'Cmd+N' : 'Ctrl+N',
             click: () => createWindow()
         }, {
-            role: 'load file',
+            role: 'loadFile',
             label: '불러오기',
             accelerator: isMac ? 'Cmd+O' : 'Ctrl+O',
             click: () => {
@@ -59,12 +59,32 @@ function createMenu() {
                 .then((result)=>focusedWindow.webContents.send('file-render:opened', result))
             }
         }, {
-            role: 'save file',
+            role: 'saveFile',
             label: '저장',
             accelerator: isMac ? 'Cmd+S' : 'Ctrl+S',
             click: () => {
                 const focusedWindow = BrowserWindow.getFocusedWindow();
                 focusedWindow.webContents.send('file-render:save-request')
+            }
+        }]
+    }))
+    menu.append(new MenuItem({
+        label: '편집', 
+        submenu: [{
+            role: 'undo',
+            label: '되돌리기',
+            accelerator: isMac? 'Cmd+Z' : 'Ctrl+Z',
+            click: () => {
+                const focusedWindow = BrowserWindow.getAllWindows();
+                focusedWindow.webContents.undo();
+            }
+        }, {
+            role: 'redo',
+            label: '다시하기',
+            accelerator: isMac? 'Cmd+Y' : 'Ctrl+Y',
+            click: () => {
+                const focusedWindow = BrowserWindow.getAllWindows();
+                focusedWindow.webContents.redo();
             }
         }]
     }))
